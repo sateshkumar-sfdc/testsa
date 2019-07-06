@@ -1,0 +1,9 @@
+# Created by .ignore support plugin (hsz.mobi)
+### ForceDotCom template
+.project
+.settings
+salesforce.schema
+Referenced Packages
+
+.idea/
+IlluminatedCloud/
