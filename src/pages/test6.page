@@ -1,0 +1,10 @@
+<apex:page standardController="account">
+<apex:pageBlock >
+<apex:pageBlockSection title="testing" collapsible="false">
+
+Testing
+</apex:pageBlockSection>
+
+</apex:pageBlock>
+
+</apex:page>

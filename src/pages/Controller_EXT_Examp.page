@@ -1,0 +1,11 @@
+<apex:page standardController="Account" extensions="MyControllerExtension">
+    <apex:form >
+    <apex:pageBlockSection >
+    	
+
+    </apex:pageBlockSection>
+    
+    
+    </apex:form>
+   
+</apex:page>

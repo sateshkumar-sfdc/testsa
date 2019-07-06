@@ -1,0 +1,671 @@
+<aura:component implements="force:appHostable" access="global" controller="SalesCoachLightning">
+    
+    <!-- Attributes -->
+    <aura:attribute name="stages" type="Object[]" default="[]"/>
+    <aura:attribute name="selectedStage" type="String" default=""/>
+    <aura:attribute name="stageActivities" type="Object[]" default="[]"/>
+    <aura:attribute name="sectionItemModalSection" type="String" default=""/>
+    <aura:attribute name="modalMode" type="String" default="" description="add or edit"/>
+    <aura:attribute name="editDetails" type="Object" default="{}"/>
+    <aura:attribute name="shouldRenderPage" type="Boolean" default="true"/>
+    <aura:attribute name="superSections" type="Object[]" default="[{},{},{},{},{}]"/>
+    
+    <!-- Handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <!-- Component Markup -->
+    <div class="slds">
+        <!-- Modals -->
+        <div aura:id="addStageActivityModal" role="dialog" class="slds-modal slds-modal--large">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <aura:if isTrue="{!v.modalMode == 'add'}">
+                        <h2 class="slds-text-heading--medium">Add Stage Activity</h2>
+                        <aura:set attribute="else">
+                            <h2 class="slds-text-heading--medium">Edit Stage Activity</h2>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <ui:inputText class="slds-input modalInputBox" aura:id="modalActivityOrdering" label="Activity Ordering" placeholder="Enter Activity Ordering" />
+                    <ui:inputText class="slds-input modalInputBox" aura:id="modalActivityDetails" label="Activity Details" placeholder="Enter Activity Details" />
+                    <p aura:id="stageActivityModalError" class="displayNone" style="color:red;">Error! Please check your input and try again. You may have entered invalid data or left the detail field blank!</p>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.cancelModal}">Cancel</button>
+                    <button class="slds-button slds-button--neutral slds-button--brand" onclick="{!c.saveActivity}">Save</button>
+                </div>
+            </div>
+        </div>
+        <div aura:id="addStageActivityBackdrop" class="slds-backdrop"></div>
+        
+        <div aura:id="addSectionItemModal" role="dialog" class="slds-modal slds-modal--large">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <aura:if isTrue="{!v.modalMode == 'add'}">
+                        <h2 class="slds-text-heading--medium">Add Section Item</h2>
+                        <aura:set attribute="else">
+                            <h2 class="slds-text-heading--medium">Edit Section Item</h2>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <ui:inputText class="slds-input modalInputBox" aura:id="modalItemOrdering" label="Item Ordering" placeholder="Enter Item Ordering" />
+                    <ui:inputText class="slds-input modalInputBox" aura:id="modalItemName" label="Item Name" placeholder="Enter Item Name" />
+                    <ui:inputText class="slds-input modalInputBox" aura:id="modalItemURL" label="Item Content URL (Entire)" placeholder="Enter Item Content URL" />
+                    <p aura:id="sectionItemModalError" class="displayNone" style="color:red;">Error! Please check your input and try again. You may have entered invalid data or left a required field blank!</p>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.cancelModal}">Cancel</button>
+                    <button class="slds-button slds-button--neutral slds-button--brand" onclick="{!c.saveSectionItem}">Save</button>
+                </div>
+            </div>
+        </div>
+        <div aura:id="addSectionItemBackdrop" class="slds-backdrop"></div>
+        
+        <!-- Prompts -->
+        <div aura:id="saveSuccessPrompt" class="slds-modal">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium">Save Successful</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <div>
+                        <p class="slds-text-align--center">Information for this stage has been saved successfully.</p>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeSaveSuccessPrompt}">Okay</button>
+                </div>
+            </div>
+        </div>
+        <div aura:id="saveSuccessBackdrop" class="slds-backdrop"></div>
+        
+        <div aura:id="saveFailurePrompt" class="slds-modal slds-modal--prompt">
+            <div class="slds-modal__container slds-modal--prompt" id="prompt-message-wrapper">
+                <div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+                    <h2 class="slds-text-heading--medium" id="prompt-heading-id">Save Unsuccessful</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <div>
+                        <p class="slds-text-align--center">
+                            Information for this stage has failed to save successfully. It may be that you are offline or
+                            you do not have permission to change stage information. Please check your network connection 
+                            and contact your administrator for details.
+                        </p>
+                    </div>
+                </div>
+                <div class="slds-modal__footer slds-theme--default">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeSaveFailurePrompt}">Okay</button>
+                </div>
+            </div>
+        </div>
+        <div aura:id="saveFailureBackdrop" class="slds-backdrop"></div>
+        
+        <!-- Main Component -->        
+        <article class="slds-card">
+            <div class="slds-card__body slds-text-align--center">
+                <h1 style="padding:10px;">
+                    <div class="slds-text-heading--medium textBold">Sales Coach Lightning</div>
+                    <div class="slds-text-heading--medium">Setup</div>
+                </h1>
+            </div>
+        </article>
+        
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                    <div class="slds-media__body slds-truncate">
+                        <h2>
+                            <span class="slds-text-heading--small textBold">Select Stage</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-text-align--left">
+                <div class="slds-box slds-theme--default">
+                    <ui:inputSelect class="slds-select" aura:id="stageSelect" label="Stage" options="{!v.stages}" change="{!c.stageChange}"/>
+                </div>
+            </div>
+        </article>
+        
+        <hr />
+        
+        <!-- Spinner -->
+        <div aura:id="pageSpinner" class="slds-spinner_container hideSpinner">
+            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+        
+        <!-- Page Guard -->
+        <aura:if isTrue="{!v.shouldRenderPage}">
+            <article class="slds-card" style="padding:10px;">
+                <p aura:id="saveError" class="displayNone" style="color:red;margin:10px;text-align:center;">Error! Could not save data. See individual sections for more details.</p>
+                <div class="slds-card__body slds-text-align--center">
+                    <button class="slds-button slds-button--brand saveButton" onclick="{!c.prepareSave}">Save</button>
+                </div>
+            </article>
+            
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                        <div class="slds-media__body slds-truncate">
+                            <h2>
+                                <span class="slds-text-heading--small textBold">Edit Stage Settings</span>
+                            </h2>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-text-align--left">
+                    <div class="slds-box slds-theme--default">
+                        <ui:inputText class="slds-input" aura:id="stageDescription" label="Stage Description" placeholder="Enter Stage Description" />
+                    </div>
+                </div>
+            </article>
+            
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                        <div class="slds-media__body slds-truncate">
+                            <h2>
+                                <span class="slds-text-heading--small textBold">Edit Stage Activities</span>
+                            </h2>
+                        </div>
+                    </header>
+                    <div class="slds-no-flex">
+                        <button class="slds-button slds-button--neutral" onclick="{!c.newStageActivity}">New</button>
+                    </div>
+                </div>
+                <div class="slds-card__body">
+                    <aura:if isTrue="{!v.stageActivities.length > 0}">
+                        <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer slds-table--fixed-layout cardTable">
+                            <thead>
+                                <tr class="titleCaps">
+                                    <th class="slds-cell-shrink">
+                                        <div class="slds-truncate slds-hidden">Del</div>
+                                    </th>
+                                    <th class="slds-cell-shrink">
+                                        <div class="slds-truncate slds-hidden">Edit</div>
+                                    </th>
+                                    <th class="slds-cell-shrink">
+                                        <div class="slds-truncate">Order</div>
+                                    </th>
+                                    <th class="slds-cell-wrap wordWrap">
+                                        <div>Activity Description</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.stageActivities}" var="stageActivity" indexVar="activityIndex">
+                                    <tr class="slds-hint-parent">
+                                        <td class="slds-cell-shrink">
+                                            <c:deleteButton data="{!activityIndex}" onclick="{!c.deleteActivity}" />
+                                        </td>
+                                        <td class="slds-cell-shrink">
+                                            <c:editButton data="{!activityIndex}" onclick="{!c.editActivity}" />
+                                        </td>
+                                        <td class="slds-cell-shrink centerText">
+                                            <div class="slds-truncate">{!stageActivity.Ordering_Number__c}</div>
+                                        </td>
+                                        <td class="slds-cell-wrap wordWrap">
+                                            <div>{!stageActivity.Activity_Details__c}</div>
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                        <aura:set attribute="else">
+                            <div class="slds-text-align--center" style="margin-bottom:10px;">No Stage Activities Found</div>
+                        </aura:set>  
+                    </aura:if>
+                </div>
+            </article>
+            
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                        <div class="slds-media__body slds-truncate">
+                            <h2>
+                                <span class="slds-text-heading--small textBold">Edit Sales Coach Sections</span>
+                            </h2>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-text-align--left tabBox">
+                    <div class="slds-tabs--scoped">
+                        <ul class="slds-tabs--scoped__nav" role="tablist">
+                            <li aura:id="sectionTab" class="slds-tabs--scoped__item slds-text-title--caps slds-active" title="Section 1" role="presentation">
+                                <a class="slds-tabs--scoped__link" data-data="1" role="tab" onclick="{!c.showTab}">Section 1</a>
+                            </li>
+                            <li aura:id="sectionTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Section 2" role="presentation">
+                                <a class="slds-tabs--scoped__link" data-data="2" role="tab" onclick="{!c.showTab}">Section 2</a>
+                            </li>
+                            <li aura:id="sectionTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Section 3" role="presentation">
+                                <a class="slds-tabs--scoped__link" data-data="3" role="tab" onclick="{!c.showTab}">Section 3</a>
+                            </li>
+                            <li aura:id="sectionTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Section 4" role="presentation">
+                                <a class="slds-tabs--scoped__link" data-data="4" role="tab" onclick="{!c.showTab}">Section 4</a>
+                            </li>
+                            <li aura:id="sectionTab" class="slds-tabs--scoped__item slds-text-title--caps" title="Section 5" role="presentation">
+                                <a class="slds-tabs--scoped__link" data-data="5" role="tab" onclick="{!c.showTab}">Section 5</a>
+                            </li>
+                        </ul>
+                        
+                        <!-- Tab 1 Body -->
+                        <div aura:id="tabScoped" class="slds-tabs--scoped__content slds-show" role="tabpanel" style="padding:10px;">
+                            <div class="slds-box slds-box--small slds-theme--shade slds-text-align--left" style="margin:10px;padding:0px;">
+                                <div style="margin:10px;">
+                                    <ui:inputText class="slds-input modalInputBox" aura:id="sectionName" label="Section Name" placeholder="Enter Section Name" />
+                                    <p aura:id="sectionNameError" class="displayNone" style="color:red;">Error! Section Name CAN NOT be empty if there are section items present!</p>
+                                    <div class="slds-grid">
+                                        <div class="slds-col" style="margin-left:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionOrder" label="Section Order" placeholder="Enter Section Order" />
+                                            <p aura:id="sectionOrderError" class="displayNone" style="color:red;">Error! Section Order MUST be a valid number!</p>
+                                        </div>
+                                        <div class="slds-col" style="margin-right:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionWidth" label="Section Width % in Salesforce Classic" placeholder="Enter Section Width % (Only applies to Salesforce Classic)" />
+                                            <p aura:id="sectionWidthError" class="displayNone" style="color:red;">Error! Section Width MUST be a valid percentage!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <hr style="margin-top:5px;margin-bottom:10px;"/>
+                                
+                                <div class="slds-grid" style="margin:10px;">
+                                    <span class="slds-text-heading--small textBold">Section Items</span>
+                                    <div class="slds-col--bump-left">
+                                        <button class="slds-button slds-button--neutral" data-data="1" onclick="{!c.newSectionItemModal}">New</button>
+                                    </div>
+                                </div>
+                                <aura:if isTrue="{!v.superSections[0].salesCoachSectionItems.length > 0}">
+                                    <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer slds-table--fixed-layout cardTable">
+                                        <thead>
+                                            <tr class="titleCaps">
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Del</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Edit</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate">Order</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Name</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Content Url (ENTIRE)</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.superSections[0].salesCoachSectionItems}" var="sectionItem" indexVar="itemsIndex">
+                                                <tr class="slds-hint-parent">
+                                                    <td class="slds-cell-shrink">
+                                                        <c:deleteButton data="{!'1,' + itemsIndex}" onclick="{!c.deleteItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink">
+                                                        <c:editButton data="{!'1,' + itemsIndex}" onclick="{!c.editItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink centerText">
+                                                        <div class="slds-truncate">{!sectionItem.Section_Ordering__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Item_Name__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Link_to_Content__c}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                            
+                                        </tbody>
+                                    </table>
+                                    <aura:set attribute="else">
+                                        <div class="slds-text-align--center" style="margin-bottom:10px;">No Section Items Found</div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                            <div class="slds-grid" style="margin-right:10px;">
+                                <div class="slds-col--bump-left">
+                                    <button class="slds-button slds-button--destructive" data-data="1" onclick="{!c.clearSectionInfo}">Clear Section</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tab 2 Body -->
+                        <div aura:id="tabScoped" class="slds-tabs--scoped__content slds-hide" role="tabpanel" style="padding:10px;">
+                            <div class="slds-box slds-box--small slds-theme--shade slds-text-align--left" style="margin:10px;padding:0px;">
+                                <div style="margin:10px;">
+                                    <ui:inputText class="slds-input modalInputBox" aura:id="sectionName" label="Section Name" placeholder="Enter Section Name" />
+                                    <p aura:id="sectionNameError" class="displayNone" style="color:red;">Error! Section Name CAN NOT be empty if there are section items present!</p>
+                                    <div class="slds-grid">
+                                        <div class="slds-col" style="margin-left:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionOrder" label="Section Order" placeholder="Enter Section Order" />
+                                            <p aura:id="sectionOrderError" class="displayNone" style="color:red;">Error! Section Order MUST be a valid number!</p>
+                                        </div>
+                                        <div class="slds-col" style="margin-right:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionWidth" label="Section Width % in Salesforce Classic" placeholder="Enter Section Width % (Only applies to Salesforce Classic)" />
+                                            <p aura:id="sectionWidthError" class="displayNone" style="color:red;">Error! Section Width MUST be a valid percentage!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <hr style="margin-top:5px;margin-bottom:10px;"/>
+                                
+                                <div class="slds-grid" style="margin:10px;">
+                                    <span class="slds-text-heading--small textBold">Section Items</span>
+                                    <div class="slds-col--bump-left">
+                                        <button class="slds-button slds-button--neutral" data-data="2" onclick="{!c.newSectionItemModal}">New</button>
+                                    </div>
+                                </div>
+                                <aura:if isTrue="{!v.superSections[1].salesCoachSectionItems.length > 0}">
+                                    <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer slds-table--fixed-layout cardTable">
+                                        <thead>
+                                            <tr class="titleCaps">
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Del</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Edit</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate">Order</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Name</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Content Url (ENTIRE)</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.superSections[1].salesCoachSectionItems}" var="sectionItem" indexVar="itemsIndex">
+                                                <tr class="slds-hint-parent">
+                                                    <td class="slds-cell-shrink">
+                                                        <c:deleteButton data="{!'2,' + itemsIndex}" onclick="{!c.deleteItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink">
+                                                        <c:editButton data="{!'2,' + itemsIndex}" onclick="{!c.editItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink centerText">
+                                                        <div class="slds-truncate">{!sectionItem.Section_Ordering__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Item_Name__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Link_to_Content__c}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                            
+                                        </tbody>
+                                    </table>
+                                    <aura:set attribute="else">
+                                        <div class="slds-text-align--center" style="margin-bottom:10px;">No Section Items Found</div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                            <div class="slds-grid" style="margin-right:10px;">
+                                <div class="slds-col--bump-left">
+                                    <button class="slds-button slds-button--destructive" data-data="2" onclick="{!c.clearSectionInfo}">Clear Section</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tab 3 Body -->
+                        <div aura:id="tabScoped" class="slds-tabs--scoped__content slds-hide" role="tabpanel" style="padding:10px;">
+                            <div class="slds-box slds-box--small slds-theme--shade slds-text-align--left" style="margin:10px;padding:0px;">
+                                <div style="margin:10px;">
+                                    <ui:inputText class="slds-input modalInputBox" aura:id="sectionName" label="Section Name" placeholder="Enter Section Name" />
+                                    <p aura:id="sectionNameError" class="displayNone" style="color:red;">Error! Section Name CAN NOT be empty if there are section items present!</p>
+                                    <div class="slds-grid">
+                                        <div class="slds-col" style="margin-left:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionOrder" label="Section Order" placeholder="Enter Section Order" />
+                                            <p aura:id="sectionOrderError" class="displayNone" style="color:red;">Error! Section Order MUST be a valid number!</p>
+                                        </div>
+                                        <div class="slds-col" style="margin-right:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionWidth" label="Section Width % in Salesforce Classic" placeholder="Enter Section Width % (Only applies to Salesforce Classic)" />
+                                            <p aura:id="sectionWidthError" class="displayNone" style="color:red;">Error! Section Width MUST be a valid percentage!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <hr style="margin-top:5px;margin-bottom:10px;"/>
+                                
+                                <div class="slds-grid" style="margin:10px;">
+                                    <span class="slds-text-heading--small textBold">Section Items</span>
+                                    <div class="slds-col--bump-left">
+                                        <button class="slds-button slds-button--neutral" data-data="3" onclick="{!c.newSectionItemModal}">New</button>
+                                    </div>
+                                </div>
+                                <aura:if isTrue="{!v.superSections[2].salesCoachSectionItems.length > 0}">
+                                    <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer slds-table--fixed-layout cardTable">
+                                        <thead>
+                                            <tr class="titleCaps">
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Del</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Edit</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate">Order</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Name</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Content Url (ENTIRE)</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.superSections[2].salesCoachSectionItems}" var="sectionItem" indexVar="itemsIndex">
+                                                <tr class="slds-hint-parent">
+                                                    <td class="slds-cell-shrink">
+                                                        <c:deleteButton data="{!'3,' + itemsIndex}" onclick="{!c.deleteItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink">
+                                                        <c:editButton data="{!'3,' + itemsIndex}" onclick="{!c.editItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink centerText">
+                                                        <div class="slds-truncate">{!sectionItem.Section_Ordering__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Item_Name__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Link_to_Content__c}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                            
+                                        </tbody>
+                                    </table>
+                                    <aura:set attribute="else">
+                                        <div class="slds-text-align--center" style="margin-bottom:10px;">No Section Items Found</div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                            <div class="slds-grid" style="margin-right:10px;">
+                                <div class="slds-col--bump-left">
+                                    <button class="slds-button slds-button--destructive" data-data="3" onclick="{!c.clearSectionInfo}">Clear Section</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tab 4 Body -->
+                        <div aura:id="tabScoped" class="slds-tabs--scoped__content slds-hide" role="tabpanel" style="padding:10px;">
+                            <div class="slds-box slds-box--small slds-theme--shade slds-text-align--left" style="margin:10px;padding:0px;">
+                                <div style="margin:10px;">
+                                    <ui:inputText class="slds-input modalInputBox" aura:id="sectionName" label="Section Name" placeholder="Enter Section Name" />
+                                    <p aura:id="sectionNameError" class="displayNone" style="color:red;">Error! Section Name CAN NOT be empty if there are section items present!</p>
+                                    <div class="slds-grid">
+                                        <div class="slds-col" style="margin-left:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionOrder" label="Section Order" placeholder="Enter Section Order" />
+                                            <p aura:id="sectionOrderError" class="displayNone" style="color:red;">Error! Section Order MUST be a valid number!</p>
+                                        </div>
+                                        <div class="slds-col" style="margin-right:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionWidth" label="Section Width % in Salesforce Classic" placeholder="Enter Section Width % (Only applies to Salesforce Classic)" />
+                                            <p aura:id="sectionWidthError" class="displayNone" style="color:red;">Error! Section Width MUST be a valid percentage!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <hr style="margin-top:5px;margin-bottom:10px;"/>
+                                
+                                <div class="slds-grid" style="margin:10px;">
+                                    <span class="slds-text-heading--small textBold">Section Items</span>
+                                    <div class="slds-col--bump-left">
+                                        <button class="slds-button slds-button--neutral" data-data="4" onclick="{!c.newSectionItemModal}">New</button>
+                                    </div>
+                                </div>
+                                <aura:if isTrue="{!v.superSections[3].salesCoachSectionItems.length > 0}">
+                                    <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer slds-table--fixed-layout cardTable">
+                                        <thead>
+                                            <tr class="titleCaps">
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Del</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Edit</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate">Order</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Name</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Content Url (ENTIRE)</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.superSections[3].salesCoachSectionItems}" var="sectionItem" indexVar="itemsIndex">
+                                                <tr class="slds-hint-parent">
+                                                    <td class="slds-cell-shrink">
+                                                        <c:deleteButton data="{!'4,' + itemsIndex}" onclick="{!c.deleteItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink">
+                                                        <c:editButton data="{!'4,' + itemsIndex}" onclick="{!c.editItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink centerText">
+                                                        <div class="slds-truncate">{!sectionItem.Section_Ordering__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Item_Name__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Link_to_Content__c}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                            
+                                        </tbody>
+                                    </table>
+                                    <aura:set attribute="else">
+                                        <div class="slds-text-align--center" style="margin-bottom:10px;">No Section Items Found</div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                            <div class="slds-grid" style="margin-right:10px;">
+                                <div class="slds-col--bump-left">
+                                    <button class="slds-button slds-button--destructive" data-data="4" onclick="{!c.clearSectionInfo}">Clear Section</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tab 5 Body -->
+                        <div aura:id="tabScoped" class="slds-tabs--scoped__content slds-hide" role="tabpanel" style="padding:10px;">
+                            <div class="slds-box slds-box--small slds-theme--shade slds-text-align--left" style="margin:10px;padding:0px;">
+                                <div style="margin:10px;">
+                                    <ui:inputText class="slds-input modalInputBox" aura:id="sectionName" label="Section Name" placeholder="Enter Section Name" />
+                                    <p aura:id="sectionNameError" class="displayNone" style="color:red;">Error! Section Name CAN NOT be empty if there are section items present!</p>
+                                    <div class="slds-grid">
+                                        <div class="slds-col" style="margin-left:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionOrder" label="Section Order" placeholder="Enter Section Order" />
+                                            <p aura:id="sectionOrderError" class="displayNone" style="color:red;">Error! Section Order MUST be a valid number!</p>
+                                        </div>
+                                        <div class="slds-col" style="margin-right:0px;">
+                                            <ui:inputText class="slds-input modalInputBox" aura:id="sectionWidth" label="Section Width % in Salesforce Classic" placeholder="Enter Section Width % (Only applies to Salesforce Classic)" />
+                                            <p aura:id="sectionWidthError" class="displayNone" style="color:red;">Error! Section Width MUST be a valid percentage!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <hr style="margin-top:5px;margin-bottom:10px;"/>
+                                
+                                <div class="slds-grid" style="margin:10px;">
+                                    <span class="slds-text-heading--small textBold">Section Items</span>
+                                    <div class="slds-col--bump-left">
+                                        <button class="slds-button slds-button--neutral" data-data="5" onclick="{!c.newSectionItemModal}">New</button>
+                                    </div>
+                                </div>
+                                <aura:if isTrue="{!v.superSections[4].salesCoachSectionItems.length > 0}">
+                                    <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer slds-table--fixed-layout cardTable">
+                                        <thead>
+                                            <tr class="titleCaps">
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Del</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate slds-hidden">Edit</div>
+                                                </th>
+                                                <th class="slds-cell-shrink">
+                                                    <div class="slds-truncate">Order</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Name</div>
+                                                </th>
+                                                <th class="slds-cell-wrap wordWrap">
+                                                    <div>Item Content Url (ENTIRE)</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.superSections[4].salesCoachSectionItems}" var="sectionItem" indexVar="itemsIndex">
+                                                <tr class="slds-hint-parent">
+                                                    <td class="slds-cell-shrink">
+                                                        <c:deleteButton data="{!'5,' + itemsIndex}" onclick="{!c.deleteItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink">
+                                                        <c:editButton data="{!'5,' + itemsIndex}" onclick="{!c.editItem}" />
+                                                    </td>
+                                                    <td class="slds-cell-shrink centerText">
+                                                        <div class="slds-truncate">{!sectionItem.Section_Ordering__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Item_Name__c}</div>
+                                                    </td>
+                                                    <td class="slds-cell-wrap wordWrap">
+                                                        <div>{!sectionItem.Link_to_Content__c}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                            
+                                        </tbody>
+                                    </table>
+                                    <aura:set attribute="else">
+                                        <div class="slds-text-align--center" style="margin-bottom:10px;">No Section Items Found</div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                            <div class="slds-grid" style="margin-right:10px;">
+                                <div class="slds-col--bump-left">
+                                    <button class="slds-button slds-button--destructive" data-data="5" onclick="{!c.clearSectionInfo}">Clear Section</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </aura:if>
+    </div>
+</aura:component>

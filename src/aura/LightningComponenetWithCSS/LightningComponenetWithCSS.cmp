@@ -1,0 +1,12 @@
+<aura:component >
+    <h1> Hello Welcome 2 Lightning.</h1>
+    <H2> welcome 2 Salesforce World </H2>
+    <ltng:require styles="/resource/Bootstrap" />
+    <div class="MyBootStrap">
+    
+    hello
+    </div>
+        
+        
+	
+</aura:component>

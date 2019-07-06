@@ -1,0 +1,46 @@
+.THIS .slds-card {
+    margin: 20px;
+}
+
+.THIS .slds-box {
+    margin: 20px;
+}
+
+.THIS .slds-col {
+    margin: 10px;
+}
+
+.THIS .textBold {
+    font-weight: bold;
+}
+
+.THIS .cardTable {
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.THIS .centerText {
+    text-align: center;
+}
+
+.THIS .wordWrap {
+    word-wrap: break-word;
+}
+
+.THIS .titleCaps {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: grey;
+}
+
+.THIS .hideSpinner {
+    display: none;
+}
+
+.THIS .showSpinner {
+    display: block;
+}
+
+.THIS .whiteSpaceNormal {
+    white-space: normal;
+}

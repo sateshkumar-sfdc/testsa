@@ -1,0 +1,6 @@
+<apex:page >
+    <b>Welcome</b>
+    <h1>
+        this is satish. how are you and how you are doing.
+    </h1>
+</apex:page>

@@ -1,0 +1,28 @@
+public class httpCallOutCtrl {
+    //Pass in the endpoint to be used using the string url
+    @AuraEnabled
+    public static Map <String, Object> getCalloutResponseContents(String url){
+        
+        // Instantiate a new http object
+        Http h = new Http();
+        
+        // Instantiate a new HTTP request, specify the method (GET) as well as the endpoint
+         HttpRequest req = new HttpRequest();
+        req.setEndpoint(url);
+        req.setMethod('GET');
+        
+        //Send the request and return the response
+        HttpResponse res = h.send(req);
+        System.debug('responce: -----> '+res.getBody());
+        
+        //Deserialize the JSON string in to colloctions of premitive data types.
+        Map<String, Object> resultsMap =(Map <String, Object>) JSON.deserializeUntyped(res.getBody());
+        System.debug('resultsMap--->'+resultsMap);
+        return resultsMap;
+        
+        
+         
+        
+    }
+
+}

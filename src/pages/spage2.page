@@ -1,0 +1,5 @@
+<apex:page >
+    <h1>
+        this is new page
+    </h1>
+</apex:page>

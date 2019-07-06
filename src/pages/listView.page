@@ -1,0 +1,22 @@
+<apex:page StandardController="Account" RecordSetVar="Accounts" >
+    <apex:form >
+        <apex:pageBlock title="All accounts accross the organization">
+            <apex:panelGrid columns="2">
+            <apex:commandLink action="{!previous}">Previous </apex:commandLink>
+            <apex:commandLink action="{!next}">Next </apex:commandLink>
+        </apex:panelGrid>
+            <apex:pageBlockTable value="{!Accounts}" var="a">
+            <apex:column headerValue="Account Name">
+                <apex:commandLink value="{!a.name}" action="/{!a.id}"/>
+            </apex:column>
+                
+                <apex:column value="{!a.AccountNumber}"/>
+                <apex:column value="{!a.Website}"/>
+                <apex:column value="{!a.Phone}"/>
+                <apex:column value="{!a.Type}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+        
+    </apex:form>
+ 
+</apex:page>

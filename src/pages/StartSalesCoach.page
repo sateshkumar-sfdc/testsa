@@ -1,0 +1,96 @@
+<apex:page >
+    <apex:sectionHeader title="Getting Started" subtitle="How To Setup Sales Coach"/>
+    <apex:pageBlock >
+        <h1 id ="textTop">Instructions for Salesforce Lightning</h1> 
+        <apex:pageBlockSection id="textSection">
+            <ul>
+                <li>Follow these instructions to configure sales coach for lightning:<br/>
+                    <ol>
+                        <li>Enter Lightning App Builder through the Opportunity Record Home Page</li>
+                        <li>Select Edit Page from the Setup Gear in the top right corner (ask your administrator for permission)</li> 
+                        <li>From Lightning App Builder, drag the custom Sales Coach Lightning component anywhere on the page</li>
+                        <li>The recommended placement is under a new tab called Sales Coach Lightning (See Screenshot Below)</li>
+                        <li>You can enter Sales Coach Setup by selecting the Sales Coach Setup Tab in App Launcher (App Launcher is the waffle in the top right corner).</li>
+                    </ol>
+                    <br/>
+                </li>
+                
+                <li>Follow these instructions to setup stages:<br/>
+                    <ol>
+                        <li>Select an opportunity Stage Name from the picklist in the "Select Stage" Section</li>
+                        <li>Enter a Stage Description in the "Edit Stage Settings" Section</li> 
+                        <li>In the "Edit Stage Activities" Section, you can add a new Stage Activity (New), Delete a Stage Activity (Trash Icon), Or Edit an Existing Stage Activity (Edit Icon)</li>
+                        <li>In the "Edit Sales Coach Sections" Section, start by selecting a Section Tab (Section 1 to Section 5)</li>
+                        <li>Enter a Section Name, Section Order and Section Width</li>
+                        <li>In the "Section Items" Section, you can add a Section Item (New), Delete a Section Item (Trash Icon), or Edit an Existing Section Item (Edit Icon)</li>
+                    	<li>To clear all Section Details (Name, Order, Width, and Section Items), Click on the "Clear Section" button.</li>
+                        <li>Once you are finished updating the current Opportunity Stage, Press the "Save" button to save your changes.</li>
+                    </ol>
+                    <br/>
+                </li>
+                
+                <li>Repeat for all stages.</li>
+            </ul> 
+        </apex:pageBlockSection>
+        <apex:pageBlockSection id="pics" >
+            <apex:image url="{!URLFOR($Resource.SalesCoachLightningStart1)}" id="img1" />
+            <br/>
+            <apex:image url="{!URLFOR($Resource.SalesCoachLightningStart2)}" id="img2" />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    
+    <apex:pageBlock >
+        <h1 id ="textTop">Instructions for Salesforce Classic</h1> 
+        <apex:pageBlockSection id="textSection">
+            <ul>
+                <li>Follow these instructions to setup stages:<br/>
+                    <ol>
+                        <li>Select an opportunity Stage Name(A) from the picklist.</li>
+                        <li>Stage Activities(C)</li> 
+                        <li>Once selected the administrator can define the Stage Description(B),</li>
+                        <li>Content Sections(D),</li>
+                        <li> and Content Section Items(E) they want to display for the sales person.</li>
+                        <li> The “Item Content URL” field is a perfect place to link Salesforce Content such as PowerPoints, Spreadsheets, etc.  This field is optional and can be left blank.</li>
+                    </ol>
+                    <br/>
+                    <ul>
+                        <li>Note: If you desire more than 3 Stage Activities(C) or 3 Section Items(E), click Save and 3 more fields will appear.</li>
+                    </ul>
+                    <br/>
+                </li>
+                <li>Repeat the previous step for each Stage.</li>
+            </ul> 
+        </apex:pageBlockSection>
+        <apex:pageBlockSection id="pics" >
+            <apex:image url="{!URLFOR($Resource.SalesCoachStart1)}" id="img1" />
+            <br/>
+            <apex:image url="{!URLFOR($Resource.SalesCoachStart2)}" id="img2" />
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    
+    <style type="text/css">
+        #textTop{
+        font-size:160%;
+        font-style:oblique;
+        text-decoration:underline; 
+        }
+        
+        img[id*="img1"]{
+        border:0 none;
+        height:auto;
+        width:800px;
+        }
+        
+        img[id*="img2"]{
+        border:0 none;
+        height:auto;
+        width:800px;
+        }
+        #textSection{
+        }
+        
+        #pics{
+        }
+        
+    </style>
+</apex:page>

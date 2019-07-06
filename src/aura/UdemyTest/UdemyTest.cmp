@@ -1,0 +1,13 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="num1" type="Integer" default="160"/> 
+    <aura:attribute name="num2" type="Integer" default="20"/>
+    <aura:attribute name="Sum" type="Integer" />
+    <br></br>
+    <div class="slds-align_absolute-center" style="height: 5rem;">{!v.num1} + {!v.num2}={!v.Sum}</div>
+   <!-- {!v.num1} + {!v.num2}={!v.Sum}-->
+    <br></br>
+    <br></br>
+    <ui:button label="Click Me/ Press Me" press="{!c.add}"/>
+    
+    
+</aura:component>

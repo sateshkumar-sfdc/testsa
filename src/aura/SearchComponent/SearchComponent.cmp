@@ -1,0 +1,41 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="TestCon">
+    <aura:attribute name="listContact" type="Contact[]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <br></br>
+    <br></br>
+    <br></br>
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_striped">
+        <thead>
+            <tr class="slds-text-title_caps">
+                <th scope="col">
+                    <div class="slds-truncate" title="Id">Id</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="Last Name">Last Name</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="Phone">Phone</div>
+                </th>
+            </tr>
+        </thead>
+        <tbody> 
+            <aura:iteration items="{!v.listContact}" var="con">
+                
+                <tr>
+                    <th scope="row" data-label="Id">
+                        <div class="slds-truncate" title="id">{!con.Id}</div>
+                    </th>
+                    <td data-label="Account Name">
+                        <div class="slds-truncate" title="LastName">{!con.LastName}</div>
+                    </td>
+                    <td data-label="Close Date">
+                        <div class="slds-truncate" title="Phone">{!con.Phone}</div>
+                    </td>
+                </tr>
+                               
+            </aura:iteration>
+        </tbody>
+        
+    </table>
+      
+</aura:component>

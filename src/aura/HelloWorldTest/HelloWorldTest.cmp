@@ -1,0 +1,5 @@
+<aura:component >
+    <h1>This lightning test component 1</h1>
+    <h2>satish</h2>
+	
+</aura:component>

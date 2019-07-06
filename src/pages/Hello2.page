@@ -1,0 +1,13 @@
+<apex:page standardController="Account">
+    <apex:form >
+    <apex:pageBlock title="My Account Information">
+        <apex:pageBlockSection title="User Details">
+            <apex:outputField value="{!Account.Name}"/>
+            <apex:outputField value="{!Account.AccountNumber}"/>
+            <apex:outputField value="{!Account.Website}"/>
+            <apex:outputField value="{!Account.NumberofLocations__c}"/>
+                    
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    </apex:form>
+</apex:page>

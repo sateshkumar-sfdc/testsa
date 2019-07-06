@@ -1,0 +1,7 @@
+<aura:component >
+	<h1><b>Welcome</b></h1>
+    <h1><b>First Name</b></h1>
+    <h1><b>Last name</b></h1>
+    <h1><b>Srijit</b></h1>
+    <h1><b>saranya</b></h1>
+</aura:component>

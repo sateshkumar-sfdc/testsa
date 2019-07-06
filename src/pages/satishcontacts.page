@@ -1,0 +1,16 @@
+<apex:page StandardController="Contact" recordSetVar="con">
+
+<apex:pageBlock title="Satish Contacts">
+<apex:PageBlockTable value="{!con}" var="c">
+<apex:column value="{!c.AccountId}"/>
+<apex:column value="{!c.FirstName}"/>
+<apex:column value="{!c.LastName}"/>
+<apex:column value="{!c.Phone}"/>
+<apex:column value="{!c.Name}"/>
+
+
+</apex:PageBlockTable>
+
+</apex:pageBlock>
+  
+</apex:page>

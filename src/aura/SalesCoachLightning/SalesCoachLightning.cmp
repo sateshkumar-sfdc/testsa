@@ -1,0 +1,178 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="SalesCoachLightning">
+    
+    <!-- Attributes -->
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="entityError" type="Boolean" default="false"/>
+    <aura:attribute name="shouldRenderPage" type="Boolean" default="true"/>
+    <aura:attribute name="stages" type="Object[]" default="[]"/>
+    <aura:attribute name="selectedStage" type="String" default=""/>
+    <aura:attribute name="stageDescription" type="String" default=""/>
+    <aura:attribute name="stageActivities" type="Object[]" default="[]"/>
+    <aura:attribute name="stageSections" type="Object[]" default="[]"/>
+    
+    <!-- Handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <!-- Main Component -->
+    
+    <div class="slds">
+        <!-- Page Guard -->
+        <aura:if isTrue="{!!v.entityError}">
+            <article class="slds-card">
+                <div class="slds-card__body slds-text-align--center">
+                    <h1 style="padding:10px;">
+                        <div class="slds-text-heading--medium textBold whiteSpaceNormal">Sales Coach Lightning</div>
+                        <div class="slds-text-heading--medium whiteSpaceNormal">Stage: {!v.selectedStage}</div>
+                    </h1>
+                </div>
+            </article>
+            
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                        <div class="slds-media__body slds-truncate">
+                            <h2>
+                                <span class="slds-text-heading--small textBold whiteSpaceNormal">Select Stage</span>
+                            </h2>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-text-align--left">
+                    <div class="slds-box slds-theme--default">
+                        <ui:inputSelect class="slds-select" aura:id="stageSelect" label="Stage" options="{!v.stages}" change="{!c.stageChange}"/>
+                    </div>
+                </div>
+            </article>
+            
+            <hr />
+            
+            <!-- Spinner -->
+            <div aura:id="pageSpinner" class="slds-spinner_container hideSpinner">
+                <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+            
+            <!-- Render Guard -->
+            <aura:if isTrue="{!v.shouldRenderPage}">
+                <!-- Start of Display Components -->
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                        <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                            <div class="slds-media__body slds-truncate">
+                                <h2>
+                                    <div class="slds-text-heading--small whiteSpaceNormal">
+                                        <b>Stage Description:&nbsp;</b>{!v.stageDescription}&nbsp;
+                                    </div>
+                                </h2>
+                            </div>
+                        </header>
+                    </div>
+                </article>
+                
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                        <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                            <div class="slds-media__body slds-truncate">
+                                <h2>
+                                    <span class="slds-text-heading--small whiteSpaceNormal">
+                                        <b>Activities to Move&nbsp;</b>this opportunity to next stage:
+                                    </span>
+                                </h2>
+                            </div>
+                        </header>
+                    </div>
+                    <div class="slds-card__body">
+                        <aura:if isTrue="{!v.stageActivities.length > 0}">
+                            <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer slds-table--fixed-layout cardTable">
+                                <thead>
+                                    <tr class="titleCaps">
+                                        <th class="slds-cell-shrink">
+                                            <div class="slds-text-align--right">#&nbsp;</div>
+                                        </th>
+                                        <th class="slds-cell-wrap wordWrap">
+                                            <div>Activity Description</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <aura:iteration items="{!v.stageActivities}" var="stageActivity" indexVar="activityIndex">
+                                        <tr class="slds-hint-parent">
+                                            <td class="slds-cell-shrink centerText">
+                                                <div class="slds-truncate">{!stageActivity.Ordering_Number__c}&nbsp;</div>
+                                            </td>
+                                            <td class="slds-cell-wrap wordWrap">
+                                                <div>{!stageActivity.Activity_Details__c}&nbsp;</div>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                            <aura:set attribute="else">
+                                <div class="slds-text-align--center" style="color:red;margin-bottom:10px;">No Stage Activities Found</div>
+                            </aura:set>  
+                        </aura:if>
+                    </div>
+                </article>
+                
+                <aura:iteration items="{!v.stageSections}" var="section" indexVar="sectionIndex">
+                    <article class="slds-card">
+                        <div class="slds-card__header slds-grid">
+                            <header class="slds-media slds-media--center slds-has-flexi-truncate">
+                                <div class="slds-media__body slds-truncate">
+                                    <h2>
+                                        <span class="slds-text-heading--small whiteSpaceNormal">
+                                            <b>{!section.salesCoachSection.Section_Name__c}&nbsp;</b>
+                                        </span>
+                                    </h2>
+                                </div>
+                            </header>
+                        </div>
+                        <div class="slds-card__body">
+                            <aura:if isTrue="{!section.salesCoachSectionItems != null}">
+                                <table class="slds-table slds-table--bordered slds-no-row-hover slds-table--cell-buffer slds-table--fixed-layout cardTable">
+                                    <tbody>
+                                        <aura:iteration items="{!section.salesCoachSectionItems}" var="sectionItem" indexVar="sectionItemIndex">
+                                            <tr class="slds-hint-parent">
+                                                <td class="slds-cell-wrap wordWrap">
+                                                    <aura:if isTrue="{!sectionItem.Link_to_Content__c != null || sectionItem.Link_to_Content__c.length > 0}">
+                                                        <div><a href="{!sectionItem.Link_to_Content__c}">{!sectionItem.Item_Name__c}&nbsp;</a></div>
+                                                        <aura:set attribute="else">
+                                                            <div>{!sectionItem.Item_Name__c}&nbsp;</div>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </td>
+                                            </tr>
+                                        </aura:iteration>
+                                    </tbody>
+                                </table>
+                                <aura:set attribute="else">
+                                    <div class="slds-text-align--center" style="color:red;margin-bottom:10px;">No Section Items Found</div>
+                                </aura:set>  
+                            </aura:if>
+                        </div>
+                    </article>
+                </aura:iteration>
+                
+                <aura:set attribute="else">
+                    <h1>
+                        <div class="slds-text-heading--small slds-text-align--center" style="color:red;">
+                            Error! There may not be enough information about this stage to display.
+                            There must be at least 1 activity and 1 section for a stage to appear in Sales Coach.
+                            Please check your Sales Coach Setup and ensure that there is sufficient information for display.
+                        </div>
+                    </h1> 
+                </aura:set>
+            </aura:if>
+            <aura:set attribute="else">
+                <h1>
+                    <div class="slds-text-heading--medium slds-text-align--center">
+                        Sales Coach Lightning can only be used on an Opportunity Page!
+                    </div>
+                </h1>
+            </aura:set>
+        </aura:if>
+    </div>
+</aura:component>

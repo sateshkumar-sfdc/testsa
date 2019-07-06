@@ -1,0 +1,15 @@
+<apex:page StandardController="Account" recordSetVar="acc">
+<apex:form >
+<apex:pageBlock title="Recent Records">
+<apex:pageBlockTable value="{!acc}" var="a">
+<apex:column value="{!a.name}"/>
+<apex:column value="{!a.Active__c}"/>
+<apex:column value="{!a.phone}"/>
+</apex:pageBlockTable>
+<apex:pageBlockButtons location="top">
+<apex:commandButton value="Edit" action="{!edit}"/>
+
+</apex:pageBlockButtons>
+</apex:pageBlock>
+</apex:form>
+</apex:page>

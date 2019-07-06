@@ -1,0 +1,31 @@
+<apex:page standardController="Account">
+    <apex:form >
+    
+        <apex:pageBlock title="New Account Information">
+            <apex:pageBlockButtons >
+        <apex:commandButton Action="{!save}" value="Save"/>
+        <apex:commandButton Action="{!cancel}" value="Cancel"/>
+    </apex:pageBlockButtons>
+            <apex:pageBlockSection title="User Details" >
+                <apex:inputField value="{!Account.Name}"/>
+                <apex:inputField value="{!Account.AccountNumber}"/>
+                <apex:inputField value="{!Account.Website}"/>
+                <apex:inputField value="{!Account.Type}"/>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="Contact Information}" >
+                <apex:inputField value="{!Account.Phone}"/>
+                <apex:inputField value="{!Account.Fax}"/>                
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="Other Details}" >
+                <apex:inputField value="{!Account.Industry}"/>
+                <apex:inputField value="{!Account.Rating}"/>  
+                 <apex:inputField value="{!Account.No_Of_Branches__c}"/>                
+            </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+        
+    </apex:form>
+  
+</apex:page>

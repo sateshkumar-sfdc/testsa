@@ -1,0 +1,13 @@
+<apex:page controller="Example6">
+    <apex:form >
+       <apex:pageBlock title="Calculator">
+           <apex:pageBlockSection columns="1" title="Simple Operation">
+               
+           
+           </apex:pageBlockSection>
+           
+        
+        </apex:pageBlock>
+    
+    </apex:form>
+</apex:page>

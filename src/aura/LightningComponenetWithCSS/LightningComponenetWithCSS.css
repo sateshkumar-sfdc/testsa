@@ -1,0 +1,11 @@
+h1.THIS {
+    background-color:yellow;
+    font-size:30px;
+    font-style:bold;
+}
+
+h2.THIS {
+    background-color:red;
+    font-size:30px;
+    font-style:Italic;
+}

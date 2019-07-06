@@ -1,0 +1,22 @@
+<apex:page standardController="account" showHeader="true" sidebar="True">
+  <apex:form >
+     <apex:pageBlock title="Create Account">
+         <apex:pageBlockButtons location="bottom">
+             <apex:commandButton value="Save" action="{!Save}"/>
+         </apex:pageBlockButtons>
+             <apex:pageBlockSection title="Account Information" collapsible="False" columns="2">
+                    <apex:inputField value="{!account.name}"/>
+                    <apex:inputField Value="{!account.rating}"/>
+                    <apex:inputfield value="{!account.phone}"/>
+             </apex:pageBlockSection>
+             <apex:pageBlockSection title="Address Information">
+                 <apex:inputField value="{!account.BillingStreet}"/>
+                 <apex:inputField value="{!account.BillingCity}"/>
+                 <apex:inputField value="{!account.BillingCountry}"/>
+             
+             </apex:pageBlockSection>
+         
+         </apex:pageBlock>
+  
+  </apex:form>
+</apex:page>

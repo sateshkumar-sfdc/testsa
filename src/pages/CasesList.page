@@ -1,0 +1,14 @@
+<apex:page standardController="Case" recordSetVar="cas" extensions="casesext">
+    <apex:form >
+        <apex:pageBlock title="Case List view">
+            <apex:pageBlockTable value="{!cas}" var="c">
+                <apex:column value="{!c.Status}"/>
+                <apex:column value="{!c.Origin}"/>
+                <apex:column value="{!c.ContactId}"/>
+            </apex:pageBlockTable>
+            <apex:pageBlockButtons >
+               <apex:commandButton value="NewTest" action="{!NewTest}"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

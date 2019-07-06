@@ -1,0 +1,8 @@
+<apex:page standardController="Account">
+<apex:form >
+<apex:pageBlock title="RecordSave">
+
+</apex:pageBlock>
+</apex:form>
+ 
+</apex:page>

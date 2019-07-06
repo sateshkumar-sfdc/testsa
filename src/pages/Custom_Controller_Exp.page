@@ -1,0 +1,10 @@
+<apex:page controller="MyCustController">
+
+    <apex:form >
+        Emp Name: <apex:inputText value="{!empName}"/> <br/>
+        Emp Sal:  <apex:inputText value="{!empSal}"/> <br/>
+        <br/>
+        <apex:commandButton value="My button" Action="{!myAction}"/>
+    </apex:form>
+
+</apex:page>

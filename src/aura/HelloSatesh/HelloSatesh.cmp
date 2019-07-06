@@ -1,0 +1,10 @@
+<aura:component >
+    <h1> This is satesh</h1>
+    <div>
+        <div class="red"> I am red </div>
+        <div class="blue"> i am blue </div>
+        <div class="green"> i am green </div>
+        <div class="purpule"> i am purpule </div>
+    </div>
+    
+</aura:component>

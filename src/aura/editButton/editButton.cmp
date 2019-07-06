@@ -1,0 +1,9 @@
+<aura:component >
+    <aura:attribute name="onclick" type="Aura.Action" default="{!c.myAction}" description="This allows handling onClick events"/>
+    <aura:attribute name="data" type="String" description="Any data to be passed via html5 data- attribute"/>
+    
+    <button class="slds-button slds-button--icon" onclick="{!v.onclick}" data-data="{!v.data}">
+        <c:svgIcon class="tableIcon" svgPath="/resource/slds212/assets/icons/utility-sprite/svg/symbols.svg#edit" category="utility" size="small" name="edit" />
+    	<span class="slds-assistive-text">Edit</span>
+    </button>
+</aura:component>
